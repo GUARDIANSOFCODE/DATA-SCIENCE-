@@ -1,0 +1,80 @@
+# Importing necessary libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# Load the Iris dataset
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+df = pd.read_csv(url)
+
+# Display the first few rows of the dataset
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Step 1: Data Cleaning and Preparation
+print("\nDataset Info:")
+print(df.info())
+
+# Check for missing values
+print("\nMissing Values in Dataset:")
+print(df.isnull().sum())
+
+# Step 2: Exploratory Data Analysis (EDA)
+# Summary statistics
+print("\nSummary Statistics:")
+print(df.describe())
+
+# Count plot of the species
+plt.figure(figsize=(6, 4))
+sns.countplot(x='species', data=df)
+plt.title("Species Count")
+plt.show()
+
+# Pairplot to visualize the relationships between features
+sns.pairplot(df, hue='species')
+plt.show()
+
+# Step 3: Data Preprocessing
+# Split the data into features (X) and target (y)
+X = df.drop('species', axis=1)
+y = df['species']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Feature Scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 4: Building a Machine Learning Model
+# Using Logistic Regression for Classification
+model = LogisticRegression(max_iter=200)
+model.fit(X_train_scaled, y_train)
+
+# Step 5: Model Evaluation
+# Predict on test data
+y_pred = model.predict(X_test_scaled)
+
+# Confusion matrix and classification report
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# Accuracy score
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nAccuracy: {accuracy * 100:.2f}%")
+
+# Step 6: Visualizing Confusion Matrix
+sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title("Confusion Matrix Heatmap")
+plt.show()
